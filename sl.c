@@ -6,6 +6,8 @@
  *        Last Modified: 2014/06/03
  *========================================
  */
+/* sl version 5.03 : Block all signals. You can't stop a steam locomotive.   */
+/*                                              by Theodore Dubois 2015/01/31*/
 /* sl version 5.02 : Fix compiler warnings.                                  */
 /*                                              by Jeff Schwab    2014/06/03 */
 /* sl version 5.01 : removed cursor and handling of IO                       */
@@ -47,6 +49,7 @@ int add_C51(int x);
 int add_D51(int x);
 int add_sl(int x);
 void option(char *str);
+void block_signals(void);
 int my_mvaddstr(int y, int x, char *str);
 
 int ACCIDENT  = 0;
@@ -61,6 +64,12 @@ int my_mvaddstr(int y, int x, char *str)
     for ( ; *str != '\0'; ++str, ++x)
         if (mvaddch(y, x, *str) == ERR)  return ERR;
     return OK;
+}
+
+void block_signals(void) {
+    sigset_t all;
+    sigfillset(&all);
+    sigprocmask(SIG_BLOCK, &all, NULL);
 }
 
 void option(char *str)
@@ -88,7 +97,7 @@ int main(int argc, char *argv[])
         }
     }
     initscr();
-    signal(SIGINT, SIG_IGN);
+    block_signals();
     noecho();
     curs_set(0);
     nodelay(stdscr, TRUE);
